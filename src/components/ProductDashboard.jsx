@@ -102,9 +102,9 @@ const ProductDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center">
-      <header className="border border-black rounded-lg shadow-lg sticky top-0">
-        <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="border-b bg-white/80 backdrop-blur z-40 sticky top-0">
+        <div className="flex justify-between items-center p-4 mx-auto max-w-6xl">
           <h1 className="text-2xl font-bold">
             🛍️ Product Management Dashboard
           </h1>
