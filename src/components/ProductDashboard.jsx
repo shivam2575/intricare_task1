@@ -19,6 +19,7 @@ const ProductDashboard = () => {
   const [category, setCategory] = useState("All");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null); // product or null
+  const [submitting, setSubmitting] = useState(false);
 
   // fetch products + categories on mount
   useEffect(() => {
@@ -75,6 +76,28 @@ const ProductDashboard = () => {
     } catch (error) {
       console.error(error);
       alert("Failed to delete. Try again.");
+    }
+  };
+  const handleSubmit = async (payload) => {
+    setSubmitting(true);
+    try {
+      if (editing) {
+        const { id } = editing;
+        const res = await api.put(`/products/${id}`, payload);
+        const updated = { ...editing, ...payload, ...(res.data || {}) };
+        setProducts((prev) => prev.map((p) => (p.id === id ? updated : p)));
+      } else {
+        const res = await api.post(`/products`, payload);
+        const newProd =
+          res.data && res.data.id ? res.data : { ...payload, id: Date.now() };
+        setProducts((prev) => [newProd, ...prev]);
+      }
+      setModalOpen(false);
+    } catch (error) {
+      console.error(error);
+      alert("Save failed. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -143,6 +166,7 @@ const ProductDashboard = () => {
                           src={p.image}
                           alt={p.title}
                           className="h-12 w-12 object-contain"
+                          loading="lazy"
                         />
                         <div>
                           <div className="">{p.title}</div>
@@ -173,7 +197,14 @@ const ProductDashboard = () => {
         title={editing ? "Edit product" : "Add new product"}
         onClose={() => setModalOpen(false)}
       >
-        <Form categories={categories.filter((c) => c != "All")} />
+        <Form
+          mode={editing ? "edit" : "create"}
+          initial={editing || undefined}
+          onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
+          categories={categories.filter((c) => c != "All")}
+          submitting={submitting}
+        />
       </Modal>
 
       <footer></footer>

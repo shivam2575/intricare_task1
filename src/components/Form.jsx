@@ -1,72 +1,32 @@
-import axios from "axios";
 import { useState } from "react";
 import TextInput from "./reusable/TextInput";
 
 import Select from "./reusable/Select";
 import TextArea from "./reusable/TextArea";
 
-const Form = ({ categories }) => {
-  console.log(categories);
+const Form = ({
+  mode = "create",
+  initial,
+  categories,
+  onSubmit,
+  onCancel,
+  submitting,
+}) => {
   const [formData, setFormData] = useState({
-    title: "",
-    price: 0,
-    description: "",
-    category: "",
-    image: "",
+    title: initial?.title ?? "",
+    price: initial?.price ?? 0,
+    description: initial?.description ?? "",
+    category: initial?.category ?? (categories[0] || ""),
+    image:
+      initial?.image ?? "https://via.placeholder.com/300x300.png?text=Product",
   });
-  const handleFormCancel = () => {
-    setFormData({
-      title: "",
-      price: 0,
-      description: "",
-      category: "",
-      image: "",
-      rating: {
-        rate: 0.0,
-        count: 0,
-      },
-    });
-    setShowForm(false);
-  };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("https://fakestoreapi.com/products", {
-        method: "POST",
-        headers: { "Content-type": "application/json" },
-        body: JSON.stringify({
-          title: formData.title,
-          price: formData.price,
-          description: formData.description,
-          category: formData.category,
-          image: formData.image,
-          rating: {
-            rate: formData.rating.rate,
-            count: formData.rating.count,
-          },
-        }),
-      });
-      const newData = await res.data;
-      //update products;
-      setProducts([newData, ...products]);
-      //reset Form
-      setFormData({
-        title: "",
-        price: 0,
-        description: "",
-        category: "",
-        image: "",
-      });
-    } catch (error) {
-      console.error(`Error adding products: ${error.message}`);
-    }
-  };
-  const handleFormDataChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
   const update = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ ...formData, price: Number(formData.price) });
+  };
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="bg-amber-300">
       <div className="">
         <TextInput
           type="text"
@@ -101,8 +61,12 @@ const Form = ({ categories }) => {
         required={true}
       />
       <div>
-        <button>cancel</button>
-        <button>submit</button>
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Saving..." : mode === "edit" ? "Update" : "Create"}
+        </button>
       </div>
     </form>
   );
