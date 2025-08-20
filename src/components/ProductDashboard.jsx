@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/api";
 import { CATEGORIES } from "../utils/mockData";
+import Form from "./Form";
 
 const ProductDashboard = () => {
   const [products, setProducts] = useState([]);
@@ -116,6 +117,7 @@ const ProductDashboard = () => {
           </table>
         </div>
       </main>
+      <Form />
       <footer></footer>
     </div>
   );
