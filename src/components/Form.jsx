@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
 import TextInput from "./reusable/TextInput";
-import { CATEGORIES } from "../utils/mockData";
+
 import Select from "./reusable/Select";
+import TextArea from "./reusable/TextArea";
 
 const Form = ({}) => {
   const [formData, setFormData] = useState({
@@ -54,10 +55,6 @@ const Form = ({}) => {
         description: "",
         category: "",
         image: "",
-        rating: {
-          rate: 0.0,
-          count: 0,
-        },
       });
     } catch (error) {
       console.error(`Error adding products: ${error.message}`);
@@ -66,6 +63,7 @@ const Form = ({}) => {
   const handleFormDataChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+  const update = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
   return (
     <form onSubmit={handleSubmit}>
       <div className="">
@@ -73,6 +71,7 @@ const Form = ({}) => {
           type="text"
           label="Title"
           name="title"
+          onChange={update}
           value={formData.title}
           required={true}
         />
@@ -80,6 +79,7 @@ const Form = ({}) => {
           type="number"
           label="Price"
           name="price"
+          onChange={update}
           value={formData.price}
           required={true}
         />
@@ -87,10 +87,17 @@ const Form = ({}) => {
       <Select
         label="Category"
         name="category"
+        onChange={update}
         value={formData.category}
         required={true}
       />
-      <TextArea />
+      <TextArea
+        label="Description"
+        name="description"
+        onChange={update}
+        value={formData.description}
+        required={true}
+      />
       <div>
         <button>cancel</button>
         <button>submit</button>

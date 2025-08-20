@@ -9,7 +9,7 @@ const Select = ({ label, name, value, onChange, required }) => {
         <select
           name={name}
           value={value}
-          onChange={onChange}
+          onChange={(e) => onChange({ [name]: e.target.value })}
           required={required}
         >
           {CATEGORIES.map((category) => (

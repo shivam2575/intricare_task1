@@ -8,7 +8,7 @@ const TextArea = ({ label, value, onChange, required }) => {
         <textarea
           value={value}
           name={name}
-          onChange={onChange}
+          onChange={(e) => onChange({ [name]: e.target.value })}
           required={required}
         />
       </label>

@@ -9,7 +9,7 @@ const TextInput = ({ label, type = "text", value, onChange, required }) => {
           type={type}
           value={value}
           name={name}
-          onChange={onChange}
+          onChange={(e) => onChange({ [name]: e.target.value })}
           required={required}
         />
       </label>
