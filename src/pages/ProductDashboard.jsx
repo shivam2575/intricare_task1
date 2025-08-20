@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/api";
-import Form from "../components/Form";
+
+import ProductForm from "../components/Form";
 import Modal from "../components/Modal";
 
-const ProductDashboard = () => {
+export default function ProductDashboard() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([
     "electronics",
@@ -21,9 +22,9 @@ const ProductDashboard = () => {
   const [editing, setEditing] = useState(null); // product or null
   const [submitting, setSubmitting] = useState(false);
 
-  // fetch products + categories on mount
+  // Fetch products + categories on mount
   useEffect(() => {
-    let ignore = false;
+    let ignore = false; //WHY THIS?
     (async () => {
       try {
         setLoading(true);
@@ -46,8 +47,10 @@ const ProductDashboard = () => {
     return () => {
       ignore = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Derived view
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return products.filter((p) => {
@@ -58,43 +61,47 @@ const ProductDashboard = () => {
     });
   }, [products, query, category]);
 
-  //Handler functions
+  // Handlers
   const openCreate = () => {
     setEditing(null);
     setModalOpen(true);
   };
+
   const openEdit = (product) => {
     setEditing(product);
     setModalOpen(true);
   };
+
   const handleDelete = async (id) => {
     const ok = confirm("Delete this product?");
     if (!ok) return;
     try {
-      await api.delete(`products/${id}`);
-      setProducts((prev) => prev.filter((p) => p.id != id));
-    } catch (error) {
-      console.error(error);
+      await api.delete(`/products/${id}`);
+      // Optimistic UI: remove locally
+      setProducts((ps) => ps.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error(err);
       alert("Failed to delete. Try again.");
     }
   };
+
   const handleSubmit = async (payload) => {
     setSubmitting(true);
     try {
       if (editing) {
         const { id } = editing;
         const res = await api.put(`/products/${id}`, payload);
-        const updated = { ...editing, ...payload, ...(res.data || {}) };
-        setProducts((prev) => prev.map((p) => (p.id === id ? updated : p)));
+        const updated = { ...editing, ...payload, ...(res.data || {}) }; //WHY THIS?
+        setProducts((ps) => ps.map((p) => (p.id === id ? updated : p)));
       } else {
-        const res = await api.post(`/products`, payload);
-        const newProd =
+        const res = await api.post("/products", payload);
+        const created =
           res.data && res.data.id ? res.data : { ...payload, id: Date.now() };
-        setProducts((prev) => [newProd, ...prev]);
+        setProducts((ps) => [created, ...ps]);
       }
       setModalOpen(false);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       alert("Save failed. Please try again.");
     } finally {
       setSubmitting(false);
@@ -103,52 +110,55 @@ const ProductDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
-      <header className="border-b bg-white/80 backdrop-blur z-40 sticky top-0">
-        <div className="flex justify-between items-center p-4 mx-auto max-w-6xl">
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 className="text-2xl font-bold">
             🛍️ Product Management Dashboard
           </h1>
           <div className="text-xs text-gray-500">Fake Store API</div>
         </div>
       </header>
+
       <main className="max-w-6xl mx-auto px-4 py-6">
-        <section className="grid gap-3 mb-4 md:flex md:justify-between md:items-center">
+        <section className="mb-4 grid gap-3 md:flex md:items-center md:justify-between">
           <div className="flex gap-2 items-center w-full md:w-auto">
             <input
-              type="text"
-              placeholder="Search By Title..."
+              placeholder="Search by title..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 rounded-xl md:80 border p-2 outline-none focus:ring focus:ring-indigo-200"
+              className="flex-1 md:w-80 rounded-xl border p-2 outline-none focus:ring focus:ring-indigo-200"
             />
             <select
+              className="rounded-xl border p-2 outline-none focus:ring focus:ring-indigo-200 bg-white"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="rounded-xl border p-2 outline-none focus:ring focus:ring-indigo-200 bg-white"
             >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+              {categories.map((c) => (
+                <option key={c} value={c}>
+                  {c}
                 </option>
               ))}
             </select>
           </div>
+
           <div className="flex items-center gap-2">
             <button
-              className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500"
               onClick={openCreate}
+              className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500"
             >
-              ﹢ Add product
+              + Add Product
             </button>
             <button
-              className="px-3 py-2 rounded-xl border hover:bg-gray-50"
               onClick={() => window.location.reload()}
+              className="px-3 py-2 rounded-xl border hover:bg-gray-50"
+              title="Refresh from API"
             >
-              🔄 Refresh
+              ⟳ Refresh
             </button>
           </div>
         </section>
-        {/* display While loading & error */}
+
+        {/* Data States */}
         {loading && (
           <div className="grid place-items-center py-20">
             <div className="animate-spin h-8 w-8 border-4 border-gray-300 border-t-transparent rounded-full" />
@@ -159,7 +169,8 @@ const ProductDashboard = () => {
             {error}
           </div>
         )}
-        {/* products display using table */}
+
+        {/* Table */}
         {!loading && !error && (
           <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
             <table className="w-full text-sm">
@@ -168,14 +179,13 @@ const ProductDashboard = () => {
                   <th className="text-left p-3">Product</th>
                   <th className="text-left p-3 w-24">Price</th>
                   <th className="text-left p-3 w-48">Category</th>
-                  <th className="text-left p-3 w-40">Actions</th>
+                  <th className="text-right p-3 w-40">Actions</th>
                 </tr>
               </thead>
-
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
-                    <td className="p-6 text-center text-gray-500">
+                    <td className="p-6 text-center text-gray-500" colSpan={4}>
                       No products found.
                     </td>
                   </tr>
@@ -205,14 +215,14 @@ const ProductDashboard = () => {
                     <td className="p-3">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
                           onClick={() => openEdit(p)}
+                          className="px-3 py-1.5 rounded-lg border hover:bg-gray-50"
                         >
                           Edit
                         </button>
                         <button
-                          className="px-3 py-1.5 rounded-lg border text-red-600 hover:bg-red-50"
                           onClick={() => handleDelete(p.id)}
+                          className="px-3 py-1.5 rounded-lg border text-red-600 hover:bg-red-50"
                         >
                           Delete
                         </button>
@@ -225,23 +235,22 @@ const ProductDashboard = () => {
           </div>
         )}
       </main>
-      {/* Add/Edit product */}
+
+      {/* Modal: Add/Edit */}
       <Modal
         open={modalOpen}
-        title={editing ? "Edit product" : "Add new product"}
+        title={editing ? "Edit Product" : "Add Product"}
         onClose={() => setModalOpen(false)}
       >
-        <Form
+        <ProductForm
           mode={editing ? "edit" : "create"}
           initial={editing || undefined}
+          categories={categories.filter((c) => c !== "All")}
           onSubmit={handleSubmit}
           onCancel={() => setModalOpen(false)}
-          categories={categories.filter((c) => c != "All")}
           submitting={submitting}
         />
       </Modal>
     </div>
   );
-};
-
-export default ProductDashboard;
+}
