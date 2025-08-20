@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/api";
-import Form from "./Form";
-import Modal from "./Modal";
+import Form from "../components/Form";
+import Modal from "../components/Modal";
 
 const ProductDashboard = () => {
   const [products, setProducts] = useState([]);

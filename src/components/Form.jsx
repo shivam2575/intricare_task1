@@ -1,69 +1,73 @@
 import { useState } from "react";
-import TextInput from "./reusable/TextInput";
 import Select from "./reusable/Select";
 import TextArea from "./reusable/TextArea";
+import TextInput from "./reusable/TextInput";
 
-const Form = ({
+export default function ProductForm({
   mode = "create",
   initial,
   categories,
   onSubmit,
   onCancel,
   submitting,
-}) => {
-  const [formData, setFormData] = useState({
+}) {
+  const [data, setData] = useState(() => ({
     title: initial?.title ?? "",
     price: initial?.price ?? 0,
     description: initial?.description ?? "",
     category: initial?.category ?? (categories[0] || ""),
     image:
       initial?.image ?? "https://via.placeholder.com/300x300.png?text=Product",
-  });
-  const update = (patch) => setFormData((prev) => ({ ...prev, ...patch }));
+  }));
+
+  const update = (patch) => setData((d) => ({ ...d, ...patch }));
+
   const handleSubmit = (e) => {
-    e.preventDefault();
-    onSubmit({ ...formData, price: Number(formData.price) });
+    e.preventDefault(); //WHY THIS?
+    onSubmit({ ...data, price: Number(data.price) });
   };
+
   return (
-    <form onSubmit={handleSubmit} className="grid gap-3 bg-amber-300">
+    <form onSubmit={handleSubmit} className="grid gap-3">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <TextInput
           label="Title"
           name="title"
+          value={data.title}
           onChange={update}
-          value={formData.title}
-          required={true}
+          required
         />
         <TextInput
-          type="number"
           label="Price"
+          type="number"
           name="price"
+          value={data.price}
           onChange={update}
-          value={formData.price}
-          required={true}
+          required
         />
       </div>
       <Select
         label="Category"
         name="category"
-        onChange={update}
+        value={data.category}
         options={categories}
-        value={formData.category}
-        required={true}
+        onChange={update}
+        required
       />
       <TextArea
         label="Description"
         name="description"
+        value={data.description}
         onChange={update}
-        value={formData.description}
-        required={true}
+        required
       />
       <TextInput
         label="Image URL"
         name="image"
+        value={data.image}
         onChange={update}
-        value={formData.image}
       />
+
       <div className="flex items-center justify-end gap-2 pt-2">
         <button
           type="button"
@@ -75,13 +79,11 @@ const Form = ({
         <button
           type="submit"
           disabled={submitting}
-          className="px-4 py-2 rounded-xl border bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-60"
+          className="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-60"
         >
           {submitting ? "Saving..." : mode === "edit" ? "Update" : "Create"}
         </button>
       </div>
     </form>
   );
-};
-
-export default Form;
+}

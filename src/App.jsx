@@ -1,4 +1,4 @@
-import ProductDashboard from "./components/ProductDashboard";
+import ProductDashboard from "./pages/ProductDashboard";
 
 function App() {
   return <ProductDashboard />;
