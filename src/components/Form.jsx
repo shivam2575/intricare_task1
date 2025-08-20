@@ -1,6 +1,5 @@
 import { useState } from "react";
 import TextInput from "./reusable/TextInput";
-
 import Select from "./reusable/Select";
 import TextArea from "./reusable/TextArea";
 
@@ -26,10 +25,9 @@ const Form = ({
     onSubmit({ ...formData, price: Number(formData.price) });
   };
   return (
-    <form onSubmit={handleSubmit} className="bg-amber-300">
-      <div className="">
+    <form onSubmit={handleSubmit} className="grid gap-3 bg-amber-300">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <TextInput
-          type="text"
           label="Title"
           name="title"
           onChange={update}
@@ -60,11 +58,25 @@ const Form = ({
         value={formData.description}
         required={true}
       />
-      <div>
-        <button type="button" onClick={onCancel}>
+      <TextInput
+        label="Image URL"
+        name="image"
+        onChange={update}
+        value={formData.image}
+      />
+      <div className="flex items-center justify-end gap-2 pt-2">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="px-4 py-2 rounded-xl border hover:bg-gray-50"
+        >
           Cancel
         </button>
-        <button type="submit" disabled={submitting}>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="px-4 py-2 rounded-xl border bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-60"
+        >
           {submitting ? "Saving..." : mode === "edit" ? "Update" : "Create"}
         </button>
       </div>
