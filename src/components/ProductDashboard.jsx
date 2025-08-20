@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import api from "../api/api";
 import Form from "./Form";
+import Modal from "./Modal";
 
 const ProductDashboard = () => {
   const [products, setProducts] = useState([]);
@@ -16,6 +17,8 @@ const ProductDashboard = () => {
   // UI state
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing] = useState(null); // product or null
 
   // fetch products + categories on mount
   useEffect(() => {
@@ -55,6 +58,14 @@ const ProductDashboard = () => {
   }, [products, query, category]);
 
   //Handler functions
+  const openCreate = () => {
+    setEditing(null);
+    setModalOpen(true);
+  };
+  const openEdit = (product) => {
+    setEditing(product);
+    setModalOpen(true);
+  };
   const handleDelete = async (id) => {
     const ok = confirm("Delete this product?");
     if (!ok) return;
@@ -98,7 +109,7 @@ const ProductDashboard = () => {
             </select>
           </div>
           <div className="button-container">
-            <button>﹢ Add a product</button>
+            <button onClick={openCreate}>﹢ Add a product</button>
             <button onClick={() => window.location.reload()}>🔄 Refresh</button>
           </div>
         </section>
@@ -143,7 +154,7 @@ const ProductDashboard = () => {
                     <td>{p.category}</td>
                     <td>
                       <div>
-                        <button>Edit</button>
+                        <button onClick={() => openEdit(p)}>Edit</button>
                         <button onClick={() => handleDelete(p.id)}>
                           Delete
                         </button>
@@ -156,7 +167,15 @@ const ProductDashboard = () => {
           </div>
         )}
       </main>
-      <Form categories={categories.filter((c) => c != "All")} />
+      {/* Add/Edit product */}
+      <Modal
+        open={modalOpen}
+        title={editing ? "Edit product" : "Add new product"}
+        onClose={() => setModalOpen(false)}
+      >
+        <Form categories={categories.filter((c) => c != "All")} />
+      </Modal>
+
       <footer></footer>
     </div>
   );
