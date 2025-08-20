@@ -1,9 +1,9 @@
 import Form from "./Form";
 
-const FormContainer = () => {
+const FormContainer = ({ setShowForm }) => {
   return (
     <div>
-      <Form />
+      <Form setShowForm={setShowForm} />
     </div>
   );
 };
