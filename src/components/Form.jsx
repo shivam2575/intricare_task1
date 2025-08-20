@@ -5,7 +5,8 @@ import TextInput from "./reusable/TextInput";
 import Select from "./reusable/Select";
 import TextArea from "./reusable/TextArea";
 
-const Form = ({}) => {
+const Form = ({ categories }) => {
+  console.log(categories);
   const [formData, setFormData] = useState({
     title: "",
     price: 0,
@@ -88,6 +89,7 @@ const Form = ({}) => {
         label="Category"
         name="category"
         onChange={update}
+        options={categories}
         value={formData.category}
         required={true}
       />

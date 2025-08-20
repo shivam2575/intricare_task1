@@ -1,7 +1,4 @@
-import React from "react";
-import { CATEGORIES } from "../../utils/mockData";
-
-const Select = ({ label, name, value, onChange, required }) => {
+const Select = ({ label, name, value, onChange, options = [], required }) => {
   return (
     <div>
       <label>
@@ -12,9 +9,9 @@ const Select = ({ label, name, value, onChange, required }) => {
           onChange={(e) => onChange({ [name]: e.target.value })}
           required={required}
         >
-          {CATEGORIES.map((category) => (
-            <option key={category} value={category}>
-              {category}
+          {options.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
             </option>
           ))}
         </select>

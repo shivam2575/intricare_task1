@@ -54,6 +54,19 @@ const ProductDashboard = () => {
     });
   }, [products, query, category]);
 
+  //Handler functions
+  const handleDelete = async (id) => {
+    const ok = confirm("Delete this product?");
+    if (!ok) return;
+    try {
+      await api.delete(`products/${id}`);
+      setProducts((prev) => prev.filter((p) => p.id != id));
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete. Try again.");
+    }
+  };
+
   return (
     <div className="flex flex-col justify-center items-center">
       <header className="border border-black rounded-lg shadow-lg sticky top-0">
@@ -131,7 +144,9 @@ const ProductDashboard = () => {
                     <td>
                       <div>
                         <button>Edit</button>
-                        <button>Delete</button>
+                        <button onClick={() => handleDelete(p.id)}>
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -141,7 +156,7 @@ const ProductDashboard = () => {
           </div>
         )}
       </main>
-      <Form />
+      <Form categories={categories.filter((c) => c != "All")} />
       <footer></footer>
     </div>
   );
